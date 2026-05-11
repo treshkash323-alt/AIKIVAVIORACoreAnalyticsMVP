@@ -1,3 +1,13 @@
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+
+from dotenv import load_dotenv
+from openai import OpenAI
+from supabase import create_client
+
+import os
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -31,24 +41,31 @@ print(f"MODEL PROVIDER: {MODEL_PROVIDER}")
 # FASTAPI APP
 # ============================================
 
+templates = Jinja2Templates(directory="app/templates")
+
 app = FastAPI(
     title="AIKIVAVIORA Core Analytics MVP",
     version="0.1"
+)
+
+app.mount(
+    "/static",
+    StaticFiles(directory="app/static"),
+    name="static"
 )
 
 # ============================================
 # ROOT ENDPOINT
 # ============================================
 
-@app.get("/")
-def root():
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
 
-    return {
-        "status": "online",
-        "project": "AIKIVAVIORA Core Analytics MVP",
-        "database": "connected",
-        "model_provider": "DeepSeek"
-    }
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={}
+    )
 
 # ============================================
 # HEALTH CHECK
