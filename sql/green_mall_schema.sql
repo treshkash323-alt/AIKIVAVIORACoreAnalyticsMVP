@@ -3,28 +3,77 @@
 -- Core Analytics Schema v0.1
 -- =========================================
 
-create table if not exists ai_dialogs (
+-- ============================================================
+-- GREEN MALL: Core Database Schema
+-- AIKIVAVIORA Core Analytics MVP
+-- ============================================================
 
-    id bigint generated always as identity primary key,
+DROP TABLE IF EXISTS sales      CASCADE;
+DROP TABLE IF EXISTS products   CASCADE;
+DROP TABLE IF EXISTS customers  CASCADE;
+DROP TABLE IF EXISTS employees  CASCADE;
+DROP TABLE IF EXISTS cities     CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS countries  CASCADE;
 
-    created_at timestamp with time zone default timezone('utc', now()),
+CREATE TABLE countries (
+  "CountryID"    INT PRIMARY KEY,
+  "CountryName"  TEXT NOT NULL,
+  "CountryCode"  TEXT
+);
 
-    session_id text not null,
+CREATE TABLE categories (
+  "CategoryID"   INT PRIMARY KEY,
+  "CategoryName" TEXT NOT NULL
+);
 
-    user_role text,
+CREATE TABLE cities (
+  "CityID"       INT PRIMARY KEY,
+  "CityName"     TEXT NOT NULL,
+  "Zipcode"      INT,
+  "CountryID"    INT REFERENCES countries("CountryID")
+);
 
-    user_message text not null,
+CREATE TABLE employees (
+  "EmployeeID"     INT PRIMARY KEY,
+  "FirstName"      TEXT,
+  "MiddleInitial"  TEXT,
+  "LastName"       TEXT,
+  "BirthDate"      TIMESTAMP,
+  "Gender"         TEXT,
+  "CityID"         INT REFERENCES cities("CityID"),
+  "HireDate"       TIMESTAMP
+);
 
-    ai_response text,
+CREATE TABLE customers (
+  "CustomerID"     INT PRIMARY KEY,
+  "FirstName"      TEXT,
+  "MiddleInitial"  TEXT,
+  "LastName"       TEXT,
+  "CityID"         INT REFERENCES cities("CityID"),
+  "Address"        TEXT
+);
 
-    ai_agent text,
+CREATE TABLE products (
+  "ProductID"      INT PRIMARY KEY,
+  "ProductName"    TEXT NOT NULL,
+  "Price"          NUMERIC(10,4),
+  "CategoryID"     INT REFERENCES categories("CategoryID"),
+  "Class"          TEXT,
+  "ModifyDate"     TIMESTAMP,
+  "Resistant"      TEXT,
+  "IsAllergic"     TEXT,
+  "VitalityDays"   NUMERIC(10,1)
+);
 
-    sentiment text,
-
-    stage text,
-
-    validation_status text,
-
-    notes text
-
+CREATE TABLE sales (
+  "SalesID"            INT PRIMARY KEY,
+  "SalesPersonID"      INT REFERENCES employees("EmployeeID"),
+  "CustomerID"         INT REFERENCES customers("CustomerID"),
+  "ProductID"          INT REFERENCES products("ProductID"),
+  "Quantity"           INT,
+  "Discount"           NUMERIC(5,2),
+  "TotalPrice"         NUMERIC(12,2),
+  "SalesDate"          TIMESTAMP,
+  "TransactionNumber"  TEXT
 );
