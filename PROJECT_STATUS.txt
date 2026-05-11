@@ -1,0 +1,13 @@
+STATUS: ACTIVE
+
+PROJECT:
+AIKIVAVIORA Core Analytics MVP
+
+TYPE:
+Learning + Reusable Core Architecture
+
+CURRENT STAGE:
+Supabase + Analytics + AI Studio
+
+NEXT STEP:
+Supabase project initialization
