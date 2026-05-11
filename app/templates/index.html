@@ -3,98 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>AIKIVAVIORA Core Analytics MVP</title>
-
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 
 <body>
 
-    <div class="background-glow"></div>
+<div class="page">
 
-    <div class="main-container">
+    <header class="top-header">
+        <h1>AIKIVAVIORA</h1>
+        <p>Core Analytics MVP</p>
+        <div class="system-online">● SYSTEM ONLINE</div>
+    </header>
 
-        <header class="header">
+    <main class="dashboard">
 
-            <h1>AIKIVAVIORA</h1>
-
-            <p class="subtitle">
-                Core Analytics MVP
-            </p>
-
-            <div class="status-bar">
-                <span class="status-online"></span>
-                SYSTEM ONLINE
-            </div>
-
-        </header>
-
-        <main class="chat-container">
-
+        <section class="chat-panel">
             <div class="chat-window" id="chat-window">
-
-                <div class="ai-message">
+                <div class="message ai-message">
                     Добро пожаловать в AIKIVAVIORA Core Analytics MVP.
                 </div>
-
             </div>
 
-            <div class="input-panel">
+            <div class="chat-input-row">
+                <input id="user-input" type="text" placeholder="Введите сообщение...">
+                <button id="send-button">✈ ОТПРАВИТЬ ЗАПРОС</button>
+            </div>
+        </section>
 
-                <textarea
-                    id="user-input"
-                    placeholder="Введите сообщение..."
-                ></textarea>
-
-                <button id="send-button">
-                    AIKIVAVIORA
-                </button>
-
+        <aside class="info-panel">
+            <div class="logo-frame">
+                <img src="/static/img/aviora_logo.png" alt="AIKIVAVIORA" class="aviora-logo">
             </div>
 
-        </main>
+            <h2>AIKIVAVIORA Core Analytics MVP</h2>
 
-        <footer class="footer">
+            <p class="product-desc">
+                Интеллектуальная аналитическая платформа нового поколения
+                для работы с данными, принятия решений и роста бизнеса.
+            </p>
 
-            <div class="footer-logo">
-                AIKIVAVIORA
+            <div class="divider"></div>
+
+            <h3>ВОЗМОЖНОСТИ:</h3>
+
+            <ul class="feature-list">
+                <li>Анализ данных и выявление инсайтов</li>
+                <li>Прогнозирование и моделирование</li>
+                <li>Визуализация и дашборды в реальном времени</li>
+                <li>Интеграция с различными источниками данных</li>
+                <li>Поддержка AI-ассистента для ваших задач</li>
+            </ul>
+
+            <div class="divider"></div>
+
+            <h3>КОМУ БУДЕТ ПОЛЕЗНО:</h3>
+
+            <div class="audience-grid">
+                <div>◎<span>Аналитикам</span></div>
+                <div>♙<span>Менеджерам</span></div>
+                <div>▧<span>Предпринимателям</span></div>
+                <div>♛<span>Финансистам</span></div>
+                <div>◉<span>Маркетологам</span></div>
             </div>
+        </aside>
 
-            <div class="world-clocks">
+    </main>
 
-                <div class="clock-card">
-                    🇺🇸 USA
-                    <span id="clock-usa"></span>
-                </div>
+    <footer class="world-clock-bar">
 
-                <div class="clock-card">
-                    🇬🇧 UK
-                    <span id="clock-uk"></span>
-                </div>
+        <div class="clock-pill">
+            <span class="country">US</span>
+            <span class="time" id="clock-usa">--:--:--</span>
+        </div>
 
-                <div class="clock-card">
-                    🇫🇮 FIN
-                    <span id="clock-fin"></span>
-                </div>
+        <div class="clock-pill">
+            <span class="country">UK</span>
+            <span class="time" id="clock-uk">--:--:--</span>
+        </div>
 
-                <div class="clock-card">
-                    🇩🇪 GER
-                    <span id="clock-ger"></span>
-                </div>
+        <div class="clock-pill">
+            <span class="country">DE</span>
+            <span class="time" id="clock-ger">--:--:--</span>
+        </div>
 
-                <div class="clock-card">
-                    🇷🇺 RU
-                    <span id="clock-ru"></span>
-                </div>
+        <div class="clock-pill">
+            <span class="country">FIN</span>
+            <span class="time" id="clock-fin">--:--:--</span>
+        </div>
 
-            </div>
+        <div class="clock-pill">
+            <span class="country">RU</span>
+            <span class="time" id="clock-ru">--:--:--</span>
+        </div>
 
-        </footer>
+    </footer>
 
-    </div>
+</div>
 
-    <script src="/static/js/app.js"></script>
+<script src="/static/js/app.js"></script>
 
 </body>
 </html>
