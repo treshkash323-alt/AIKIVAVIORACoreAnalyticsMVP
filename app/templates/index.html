@@ -1,108 +1,546 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIKIVAVIORA Core Analytics MVP</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AIKIVAVIORA — Core Analytics System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --gold:         #c9a84c;
+      --gold-bright:  #f0c050;
+      --gold-dim:     #5a4820;
+      --gold-glow:    rgba(201,168,76,.35);
+      --green:        #00e676;
+      --green-dim:    rgba(0,230,118,.18);
+      --green-border: rgba(0,230,118,.35);
+      --bg-root:      #060d09;
+      --bg-panel:     #0a130d;
+      --bg-card:      #0d1810;
+      --bg-card2:     #101a12;
+      --bg-hover:     #162018;
+      --border:       rgba(0,200,100,.22);
+      --border-gold:  rgba(201,168,76,.4);
+      --text-main:    #e8fff2;
+      --text-dim:     #6a9070;
+      --text-label:   #3a5040;
+      --red-clock:    #ff3c3c;
+    }
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg-root); color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 14px; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg-root); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+    .page { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── HEADER ── */
+    .top-header {
+      display: grid;
+      grid-template-columns: 220px 1fr 220px;
+      align-items: center;
+      padding: 14px 20px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+    }
+    .hdr-logo { display: flex; align-items: center; gap: 10px; }
+    .hdr-logo-img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 0 8px var(--gold-glow)); }
+    .hdr-logo-text .name { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--gold); letter-spacing: 2px; }
+    .hdr-logo-text .sub  { font-size: 9px; letter-spacing: 2px; color: var(--text-dim); margin-top: 1px; }
+    .hdr-center { text-align: center; }
+    .hdr-title { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 700; color: var(--gold-bright); letter-spacing: 6px; text-shadow: 0 0 24px var(--gold-glow); }
+    .hdr-subtitle { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 10px; letter-spacing: 4px; color: var(--text-dim); margin-top: 5px; }
+    .hdr-subtitle::before, .hdr-subtitle::after { content: ''; flex: 1; max-width: 70px; height: 1px; background: linear-gradient(90deg, transparent, var(--gold-dim)); }
+    .hdr-subtitle::after { background: linear-gradient(90deg, var(--gold-dim), transparent); }
+    .hdr-tagline { font-size: 9px; letter-spacing: 4px; color: var(--text-label); margin-top: 5px; }
+    .hdr-partner { display: flex; align-items: center; gap: 10px; justify-content: flex-end; border: 1px solid var(--green-border); border-radius: 10px; padding: 8px 14px; background: var(--green-dim); }
+    .hdr-partner-icon { width: 34px; height: 34px; border: 1.5px solid var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--green); box-shadow: 0 0 10px rgba(0,230,118,.3); }
+    .hdr-partner-text .pname { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; color: var(--green); letter-spacing: 1px; }
+    .hdr-partner-text .psub  { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+
+    /* ── LAYOUT ── */
+    .body-layout { display: grid; grid-template-columns: 220px 1fr 220px; flex: 1; min-height: 0; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 16px 0; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 13px 20px; font-size: 12px; letter-spacing: 2px; font-weight: 600; color: var(--text-dim); cursor: pointer; border-left: 3px solid transparent; transition: all .2s; text-transform: uppercase; }
+    .nav-item:hover { color: var(--text-main); background: var(--bg-hover); }
+    .nav-item.active { color: var(--gold); background: linear-gradient(90deg, rgba(201,168,76,.12) 0%, transparent 100%); border-left-color: var(--gold); }
+    .nav-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+    .icon-chat::before     { content: '💬'; }
+    .icon-dash::before     { content: '⊞'; font-size:17px; }
+    .icon-chart::before    { content: '↗'; font-size:17px; }
+    .icon-memory::before   { content: '◈'; font-size:17px; }
+    .icon-agent::before    { content: '◉'; font-size:14px; }
+    .icon-settings::before { content: '⚙'; font-size:16px; }
+    .sidebar-divider { height: 1px; background: var(--border); margin: 14px 18px; }
+    .sys-status { padding: 0 18px; }
+    .sys-label { font-size: 9px; letter-spacing: 3px; color: var(--text-label); margin-bottom: 10px; text-transform: uppercase; }
+    .status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); flex-shrink: 0; animation: blink 2.4s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.35} }
+    .status-label { font-size: 10px; letter-spacing: 1.5px; font-weight: 700; color: var(--green); text-transform: uppercase; }
+
+    /* ── MAIN CONTENT ── */
+    .main-content { display: flex; flex-direction: column; padding: 20px; border-right: 1px solid var(--border); overflow-y: auto; }
+
+    /* VIEWS */
+    .view { display: none; flex-direction: column; flex: 1; }
+    .view.active { display: flex; }
+
+    /* ── CHAT VIEW ── */
+    .chat-panel { flex: 1; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); display: flex; flex-direction: column; overflow: hidden; position: relative; min-height: 480px; }
+    .chat-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -56%); width: 280px; height: 280px; object-fit: contain; opacity: 0.06; pointer-events: none; filter: grayscale(1); }
+    .chat-messages { flex: 1; padding: 28px 30px; overflow-y: auto; position: relative; z-index: 1; }
+    .welcome-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .welcome-title .user { color: var(--text-main); }
+    .welcome-body { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+    .msg { max-width: 75%; margin-bottom: 12px; }
+    .msg.user-msg { margin-left: auto; }
+    .msg-bubble { padding: 11px 16px; border-radius: 10px; font-size: 14px; line-height: 1.6; }
+    .msg.ai-msg   .msg-bubble { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-main); }
+    .msg.user-msg .msg-bubble { background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.06)); border: 1px solid var(--border-gold); color: var(--gold-bright); }
+    .chat-input-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--border); background: var(--bg-panel); }
+    .chat-input { flex: 1; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 14px; outline: none; resize: none; height: 52px; transition: border-color .2s; }
+    .chat-input::placeholder { color: var(--text-dim); }
+    .chat-input:focus { border-color: var(--gold-dim); }
+    .send-btn { width: 64px; height: 64px; flex-shrink: 0; border: 1.5px solid var(--gold); border-radius: 12px; background: linear-gradient(145deg, #1e1800, #0d130d); cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; transition: all .2s; box-shadow: 0 0 18px var(--gold-glow), inset 0 0 12px rgba(201,168,76,.08); }
+    .send-btn:hover { box-shadow: 0 0 30px rgba(201,168,76,.55), inset 0 0 16px rgba(201,168,76,.15); transform: scale(1.04); }
+    .send-btn img { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 0 6px var(--gold-glow)); }
+    .send-btn::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 44px; height: 10px; background: radial-gradient(ellipse, rgba(201,168,76,.45) 0%, transparent 70%); }
+
+    /* ── DASHBOARD VIEW ── */
+    .dashboard-view { gap: 16px; }
+    .dash-title { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 600; color: var(--gold); letter-spacing: 3px; margin-bottom: 4px; }
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; flex: 1; }
+    .chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+    .chart-card.wide { grid-column: 1 / -1; }
+    .chart-label { font-size: 10px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
+    .chart-wrap { position: relative; height: 200px; }
+    .chart-wrap.tall { height: 240px; }
+    .chart-loading { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-label); font-size: 12px; letter-spacing: 2px; }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel { background: var(--bg-panel); padding: 20px 16px; display: flex; flex-direction: column; gap: 22px; overflow-y: auto; }
+    .rp-block-label { font-size: 9px; letter-spacing: 3px; color: var(--text-label); text-transform: uppercase; margin-bottom: 12px; }
+    .rp-field { margin-bottom: 10px; }
+    .rp-field-label { font-size: 9px; letter-spacing: 2px; color: var(--text-label); text-transform: uppercase; }
+    .rp-field-value { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+    .rp-field-value.green { font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: var(--green); }
+    .rp-divider { height: 1px; background: var(--border); }
+    .qa-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); cursor: pointer; border-bottom: 1px solid var(--border); transition: color .2s; }
+    .qa-item:last-child { border-bottom: none; }
+    .qa-item:hover { color: var(--gold); }
+    .qa-icon { font-size: 13px; width: 16px; text-align: center; }
+
+    /* ── FOOTER ── */
+    .footer { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 16px 20px; display: grid; grid-template-columns: 240px repeat(5, 1fr); gap: 14px; align-items: center; }
+    .footer-brand { display: flex; flex-direction: column; gap: 10px; }
+    .fb-logo { display: flex; align-items: center; gap: 10px; }
+    .fb-img { width: 46px; height: 46px; object-fit: contain; filter: drop-shadow(0 0 8px var(--gold-glow)); }
+    .fb-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--gold); letter-spacing: 2px; }
+    .fb-sub  { font-size: 8px; letter-spacing: 2px; color: var(--text-dim); margin-top: 2px; }
+    .fb-desc { font-size: 11px; color: var(--text-dim); line-height: 1.55; }
+    .clock-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; transition: border-color .2s; }
+    .clock-card:hover { border-color: var(--gold-dim); }
+    .cc-country { font-size: 10px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; }
+    .cc-flag  { font-size: 22px; margin-bottom: 6px; }
+    .cc-time  { font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: 700; color: var(--red-clock); letter-spacing: 2px; text-shadow: 0 0 8px rgba(255,60,60,.4); }
+    .cc-date  { font-size: 10px; letter-spacing: 1px; color: var(--text-dim); margin-top: 5px; }
+    .cc-tz    { font-size: 9px; color: var(--text-label); margin-top: 2px; }
+  </style>
+</head>
 <body>
 
 <div class="page">
 
-    <header class="top-header">
-        <h1>AIKIVAVIORA</h1>
-        <p>Core Analytics MVP</p>
-        <div class="system-online">● SYSTEM ONLINE</div>
-    </header>
+  <!-- ══ HEADER ══ -->
+  <header class="top-header">
+    <div class="hdr-logo">
+      <img src="/static/img/aviora_logo.png" alt="Logo" class="hdr-logo-img"/>
+      <div class="hdr-logo-text">
+        <div class="name">AIKIVAVIORA</div>
+        <div class="sub">UTC INTELLIGENCE LAYER · BY KIV</div>
+      </div>
+    </div>
+    <div class="hdr-center">
+      <div class="hdr-title">AIKIVAVIORA</div>
+      <div class="hdr-subtitle">CORE ANALYTICS SYSTEM</div>
+      <div class="hdr-tagline">AI &bull; INTELLIGENCE &bull; ANALYTICS &bull; EVOLUTION</div>
+    </div>
+    <div class="hdr-partner">
+      <div class="hdr-partner-icon">✦</div>
+      <div class="hdr-partner-text">
+        <div class="pname">FarmLogistik</div>
+        <div class="psub">Аналитическая платформа</div>
+      </div>
+    </div>
+  </header>
 
-    <main class="dashboard">
+  <!-- ══ BODY ══ -->
+  <div class="body-layout">
 
-        <section class="chat-panel">
-            <div class="chat-window" id="chat-window">
-                <div class="message ai-message">
-                    Добро пожаловать в AIKIVAVIORA Core Analytics MVP.
-                </div>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="nav-item active" data-view="chat">
+        <span class="nav-icon icon-chat"></span> AI Chat
+      </div>
+      <div class="nav-item" data-view="dashboard">
+        <span class="nav-icon icon-dash"></span> Dashboard
+      </div>
+      <div class="nav-item" data-view="chat">
+        <span class="nav-icon icon-chart"></span> Analytics
+      </div>
+      <div class="nav-item" data-view="chat">
+        <span class="nav-icon icon-memory"></span> Memory Core
+      </div>
+      <div class="nav-item" data-view="chat">
+        <span class="nav-icon icon-agent"></span> Agent System
+      </div>
+      <div class="nav-item" data-view="chat">
+        <span class="nav-icon icon-settings"></span> Settings
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sys-status">
+        <div class="sys-label">System Status</div>
+        <div class="status-row"><span class="dot"></span><span class="status-label">System Online</span></div>
+        <div class="status-row"><span class="dot"></span><span class="status-label">Database Connected</span></div>
+        <div class="status-row"><span class="dot"></span><span class="status-label">DeepSeek API Ready</span></div>
+        <div class="status-row"><span class="dot"></span><span class="status-label">Memory Core Active</span></div>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+      <!-- VIEW: CHAT -->
+      <div class="view active" id="view-chat">
+        <div class="chat-panel">
+          <img src="/static/img/aviora_logo.png" alt="" class="chat-watermark"/>
+          <div class="chat-messages" id="chatMessages">
+            <div class="welcome-title">👑 Welcome, <span class="user">KIV</span></div>
+            <div class="welcome-body">Ask anything. Your AI is ready.</div>
+          </div>
+          <div class="chat-input-row">
+            <textarea id="chatInput" class="chat-input" placeholder="Type your message..." onkeydown="handleKey(event)"></textarea>
+            <button class="send-btn" onclick="sendMessage()" title="Send">
+              <img src="/static/img/aviora_logo.png" alt="Send"/>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW: DASHBOARD -->
+      <div class="view dashboard-view" id="view-dashboard">
+        <div class="dash-title">📊 ANALYTICS DASHBOARD</div>
+        <div class="dash-grid">
+
+          <!-- Monthly Revenue -->
+          <div class="chart-card wide">
+            <div class="chart-label">Monthly Revenue</div>
+            <div class="chart-wrap tall">
+              <div class="chart-loading" id="load-revenue">Loading...</div>
+              <canvas id="chartRevenue" style="display:none"></canvas>
             </div>
+          </div>
 
-            <div class="chat-input-row">
-                <input id="user-input" type="text" placeholder="Введите сообщение...">
-                <button id="send-button">✈ ОТПРАВИТЬ ЗАПРОС</button>
+          <!-- Top Products -->
+          <div class="chart-card">
+            <div class="chart-label">Top Products by Revenue</div>
+            <div class="chart-wrap">
+              <div class="chart-loading" id="load-products">Loading...</div>
+              <canvas id="chartProducts" style="display:none"></canvas>
             </div>
-        </section>
+          </div>
 
-        <aside class="info-panel">
-            <div class="logo-frame">
-                <img src="/static/img/aviora_logo.png" alt="AIKIVAVIORA" class="aviora-logo">
+          <!-- Revenue by Category -->
+          <div class="chart-card">
+            <div class="chart-label">Revenue by Category</div>
+            <div class="chart-wrap">
+              <div class="chart-loading" id="load-category">Loading...</div>
+              <canvas id="chartCategory" style="display:none"></canvas>
             </div>
+          </div>
 
-            <h2>AIKIVAVIORA Core Analytics MVP</h2>
-
-            <p class="product-desc">
-                Интеллектуальная аналитическая платформа нового поколения
-                для работы с данными, принятия решений и роста бизнеса.
-            </p>
-
-            <div class="divider"></div>
-
-            <h3>ВОЗМОЖНОСТИ:</h3>
-
-            <ul class="feature-list">
-                <li>Анализ данных и выявление инсайтов</li>
-                <li>Прогнозирование и моделирование</li>
-                <li>Визуализация и дашборды в реальном времени</li>
-                <li>Интеграция с различными источниками данных</li>
-                <li>Поддержка AI-ассистента для ваших задач</li>
-            </ul>
-
-            <div class="divider"></div>
-
-            <h3>КОМУ БУДЕТ ПОЛЕЗНО:</h3>
-
-            <div class="audience-grid">
-                <div>◎<span>Аналитикам</span></div>
-                <div>♙<span>Менеджерам</span></div>
-                <div>▧<span>Предпринимателям</span></div>
-                <div>♛<span>Финансистам</span></div>
-                <div>◉<span>Маркетологам</span></div>
+          <!-- Top Cities -->
+          <div class="chart-card">
+            <div class="chart-label">Top Cities by Revenue</div>
+            <div class="chart-wrap">
+              <div class="chart-loading" id="load-cities">Loading...</div>
+              <canvas id="chartCities" style="display:none"></canvas>
             </div>
-        </aside>
+          </div>
+
+          <!-- Top Customers -->
+          <div class="chart-card">
+            <div class="chart-label">Top Customers</div>
+            <div class="chart-wrap">
+              <div class="chart-loading" id="load-customers">Loading...</div>
+              <canvas id="chartCustomers" style="display:none"></canvas>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
     </main>
 
-    <footer class="world-clock-bar">
-
-        <div class="clock-pill">
-            <span class="country">US</span>
-            <span class="time" id="clock-usa">--:--:--</span>
+    <!-- RIGHT PANEL -->
+    <aside class="right-panel">
+      <div>
+        <div class="rp-block-label">Session Info</div>
+        <div class="rp-field">
+          <div class="rp-field-label">Session ID</div>
+          <div class="rp-field-value" id="sessionId">—</div>
         </div>
-
-        <div class="clock-pill">
-            <span class="country">UK</span>
-            <span class="time" id="clock-uk">--:--:--</span>
+        <div class="rp-field">
+          <div class="rp-field-label">Status</div>
+          <div class="rp-field-value green">ACTIVE</div>
         </div>
-
-        <div class="clock-pill">
-            <span class="country">DE</span>
-            <span class="time" id="clock-ger">--:--:--</span>
+        <div class="rp-field">
+          <div class="rp-field-label">Model</div>
+          <div class="rp-field-value">DeepSeek-R1</div>
         </div>
-
-        <div class="clock-pill">
-            <span class="country">FIN</span>
-            <span class="time" id="clock-fin">--:--:--</span>
+        <div class="rp-field">
+          <div class="rp-field-label">Memory</div>
+          <div class="rp-field-value green">ENABLED</div>
         </div>
-
-        <div class="clock-pill">
-            <span class="country">RU</span>
-            <span class="time" id="clock-ru">--:--:--</span>
+        <div class="rp-field">
+          <div class="rp-field-label">Logging</div>
+          <div class="rp-field-value green">ON</div>
         </div>
+      </div>
+      <div class="rp-divider"></div>
+      <div>
+        <div class="rp-block-label">Quick Actions</div>
+        <div class="qa-item" onclick="newSession()"><span class="qa-icon">⊕</span> New Session</div>
+        <div class="qa-item" onclick="exportLogs()"><span class="qa-icon">⬇</span> Export Logs</div>
+        <div class="qa-item" onclick="showView('dashboard')"><span class="qa-icon">◈</span> View Memory</div>
+        <div class="qa-item" onclick="checkHealth()"><span class="qa-icon">〜</span> System Health</div>
+      </div>
+    </aside>
 
-    </footer>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <div class="footer-brand">
+      <div class="fb-logo">
+        <img src="/static/img/aviora_logo.png" alt="Logo" class="fb-img"/>
+        <div>
+          <div class="fb-name">AIKIVAVIORA</div>
+          <div class="fb-sub">CORE ANALYTICS SYSTEM</div>
+        </div>
+      </div>
+      <div class="fb-desc">Интеллектуальная аналитическая платформа нового поколения для работы с данными, принятия решений и роста бизнеса.</div>
+    </div>
+    <div class="clock-card"><div class="cc-country">USA</div><div class="cc-flag">🇺🇸</div><div class="cc-time" id="clock-usa">--:--:--</div><div class="cc-date" id="date-usa">--</div><div class="cc-tz">EDT (UTC-4)</div></div>
+    <div class="clock-card"><div class="cc-country">England</div><div class="cc-flag">🇬🇧</div><div class="cc-time" id="clock-uk">--:--:--</div><div class="cc-date" id="date-uk">--</div><div class="cc-tz">BST (UTC+1)</div></div>
+    <div class="clock-card"><div class="cc-country">Germany</div><div class="cc-flag">🇩🇪</div><div class="cc-time" id="clock-ger">--:--:--</div><div class="cc-date" id="date-ger">--</div><div class="cc-tz">CEST (UTC+2)</div></div>
+    <div class="clock-card"><div class="cc-country">Finland</div><div class="cc-flag">🇫🇮</div><div class="cc-time" id="clock-fin">--:--:--</div><div class="cc-date" id="date-fin">--</div><div class="cc-tz">EEST (UTC+3)</div></div>
+    <div class="clock-card"><div class="cc-country">Russia</div><div class="cc-flag">🇷🇺</div><div class="cc-time" id="clock-ru">--:--:--</div><div class="cc-date" id="date-ru">--</div><div class="cc-tz">MSK (UTC+3)</div></div>
+  </footer>
 
 </div>
 
 <script src="/static/js/app.js"></script>
+<script>
+// ── CHART DEFAULTS ──────────────────────────────────────
+Chart.defaults.color = '#6a9070';
+Chart.defaults.borderColor = 'rgba(0,200,100,.12)';
+Chart.defaults.font.family = "'Rajdhani', sans-serif";
 
+const GOLD   = '#c9a84c';
+const GREEN  = '#00e676';
+const RED    = '#ff3c3c';
+const COLORS = ['#c9a84c','#00e676','#4caf50','#ff9800','#2196f3','#e91e63','#9c27b0','#00bcd4','#8bc34a','#ff5722'];
+
+function showLoad(id, show) {
+  const el = document.getElementById('load-' + id);
+  const cv = document.getElementById('chart' + id.charAt(0).toUpperCase() + id.slice(1));
+  if (!el || !cv) return;
+  el.style.display  = show ? 'flex' : 'none';
+  cv.style.display  = show ? 'none' : 'block';
+}
+
+// ── NAVIGATION VIEWS ────────────────────────────────────
+let dashLoaded = false;
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById('view-' + name);
+  if (target) target.classList.add('active');
+  if (name === 'dashboard' && !dashLoaded) {
+    dashLoaded = true;
+    loadAllCharts();
+  }
+}
+
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    const view = el.dataset.view || 'chat';
+    showView(view);
+  });
+});
+
+// ── LOAD ALL CHARTS ─────────────────────────────────────
+async function loadAllCharts() {
+  loadMonthlyRevenue();
+  loadTopProducts();
+  loadRevenueByCategory();
+  loadTopCities();
+  loadTopCustomers();
+}
+
+async function fetchData(url) {
+  const res = await fetch(url);
+  return await res.json();
+}
+
+// Monthly Revenue — Line chart
+async function loadMonthlyRevenue() {
+  try {
+    const data = await fetchData('/api/monthly-revenue');
+    showLoad('revenue', false);
+    new Chart(document.getElementById('chartRevenue'), {
+      type: 'line',
+      data: {
+        labels: data.map(d => d.sale_month),
+        datasets: [{
+          label: 'Revenue',
+          data: data.map(d => d.total_revenue),
+          borderColor: GOLD,
+          backgroundColor: 'rgba(201,168,76,.08)',
+          borderWidth: 2,
+          pointBackgroundColor: GOLD,
+          pointRadius: 4,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+  } catch(e) { document.getElementById('load-revenue').textContent = 'Error loading data'; }
+}
+
+// Top Products — Horizontal Bar
+async function loadTopProducts() {
+  try {
+    const data = await fetchData('/api/top-products');
+    showLoad('products', false);
+    new Chart(document.getElementById('chartProducts'), {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.product_name.substring(0, 20)),
+        datasets: [{
+          data: data.map(d => d.total_revenue),
+          backgroundColor: COLORS,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+  } catch(e) { document.getElementById('load-products').textContent = 'Error loading data'; }
+}
+
+// Revenue by Category — Doughnut
+async function loadRevenueByCategory() {
+  try {
+    const data = await fetchData('/api/revenue-by-category');
+    showLoad('category', false);
+    new Chart(document.getElementById('chartCategory'), {
+      type: 'doughnut',
+      data: {
+        labels: data.map(d => d.category_name || d.category),
+        datasets: [{
+          data: data.map(d => d.total_revenue),
+          backgroundColor: COLORS,
+          borderWidth: 1,
+          borderColor: '#0a130d'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+      }
+    });
+  } catch(e) { document.getElementById('load-category').textContent = 'Error loading data'; }
+}
+
+// Top Cities — Bar
+async function loadTopCities() {
+  try {
+    const data = await fetchData('/api/top-cities');
+    showLoad('cities', false);
+    new Chart(document.getElementById('chartCities'), {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.city_name),
+        datasets: [{
+          label: 'Revenue',
+          data: data.map(d => d.total_revenue),
+          backgroundColor: 'rgba(0,230,118,.6)',
+          borderColor: GREEN,
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+  } catch(e) { document.getElementById('load-cities').textContent = 'Error loading data'; }
+}
+
+// Top Customers — Horizontal Bar
+async function loadTopCustomers() {
+  try {
+    const data = await fetchData('/api/top-customers');
+    showLoad('customers', false);
+    new Chart(document.getElementById('chartCustomers'), {
+      type: 'bar',
+      data: {
+        labels: data.map(d => d.customer_name),
+        datasets: [{
+          data: data.map(d => d.total_revenue),
+          backgroundColor: 'rgba(201,168,76,.5)',
+          borderColor: GOLD,
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+  } catch(e) { document.getElementById('load-customers').textContent = 'Error loading data'; }
+}
+
+// ── QUICK ACTIONS ────────────────────────────────────────
+function newSession() {
+  location.reload();
+}
+
+function exportLogs() {
+  window.open('/api/monthly-revenue', '_blank');
+}
+
+async function checkHealth() {
+  const res  = await fetch('/health');
+  const data = await res.json();
+  alert(`Status: ${data.status}\nDatabase: ${data.database}\nModel: ${data.model_provider}`);
+}
+</script>
 </body>
 </html>
