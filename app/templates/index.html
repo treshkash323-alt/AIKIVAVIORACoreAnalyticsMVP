@@ -92,7 +92,7 @@
 
     /* ── CHAT VIEW ── */
     .chat-panel { flex: 1; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); display: flex; flex-direction: column; overflow: hidden; position: relative; min-height: 480px; }
-    .chat-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -56%); width: 280px; height: 280px; object-fit: contain; opacity: 0.06; pointer-events: none; filter: grayscale(1); }
+    .chat-watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -56%); width: 840px; height: 840px; object-fit: contain; opacity: 0.13; pointer-events: none; filter: grayscale(1); }
     .chat-messages { flex: 1; padding: 28px 30px; overflow-y: auto; position: relative; z-index: 1; }
     .welcome-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 600; color: var(--gold); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .welcome-title .user { color: var(--text-main); }
@@ -136,20 +136,45 @@
     .qa-icon { font-size: 13px; width: 16px; text-align: center; }
 
     /* ── FOOTER ── */
-    .footer { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 16px 20px; display: grid; grid-template-columns: 240px repeat(5, 1fr); gap: 14px; align-items: center; }
+    .footer { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 18px 24px; display: grid; grid-template-columns: 210px repeat(5, 1fr); gap: 12px; align-items: center; }
     .footer-brand { display: flex; flex-direction: column; gap: 10px; }
     .fb-logo { display: flex; align-items: center; gap: 10px; }
     .fb-img { width: 46px; height: 46px; object-fit: contain; filter: drop-shadow(0 0 8px var(--gold-glow)); }
     .fb-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--gold); letter-spacing: 2px; }
     .fb-sub  { font-size: 8px; letter-spacing: 2px; color: var(--text-dim); margin-top: 2px; }
-    .fb-desc { font-size: 11px; color: var(--text-dim); line-height: 1.55; }
-    .clock-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; transition: border-color .2s; }
-    .clock-card:hover { border-color: var(--gold-dim); }
-    .cc-country { font-size: 10px; letter-spacing: 3px; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; }
-    .cc-flag  { font-size: 22px; margin-bottom: 6px; }
-    .cc-time  { font-family: 'Share Tech Mono', monospace; font-size: 22px; font-weight: 700; color: var(--red-clock); letter-spacing: 2px; text-shadow: 0 0 8px rgba(255,60,60,.4); }
-    .cc-date  { font-size: 10px; letter-spacing: 1px; color: var(--text-dim); margin-top: 5px; }
-    .cc-tz    { font-size: 9px; color: var(--text-label); margin-top: 2px; }
+    .fb-desc { font-size: 11px; color: var(--text-main); line-height: 1.55; }
+    .clock-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(0,200,100,.28);
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      transition: all .25s;
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .clock-card:hover {
+      border-color: var(--gold-dim);
+      background: var(--bg-card2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,200,100,.08);
+    }
+    .cc-country {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 3px; color: var(--text-main);
+      text-transform: uppercase; margin-bottom: 2px;
+    }
+    .cc-flag  { font-size: 30px; line-height: 1; margin-bottom: 4px; }
+    .cc-flag-img { width: 40px; height: auto; border-radius: 3px; margin-bottom: 4px; box-shadow: 0 1px 6px rgba(0,0,0,.4); }
+    .cc-time  {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 24px; font-weight: 700;
+      color: var(--red-clock); letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(255,60,60,.5);
+      margin-bottom: 3px;
+    }
+    .cc-date  { font-size: 10px; letter-spacing: 1px; color: var(--text-main); }
+    .cc-tz    { font-size: 9px; letter-spacing: 1px; color: var(--text-dim); }
   </style>
 </head>
 <body>
@@ -336,11 +361,41 @@
       </div>
       <div class="fb-desc">Интеллектуальная аналитическая платформа нового поколения для работы с данными, принятия решений и роста бизнеса.</div>
     </div>
-    <div class="clock-card"><div class="cc-country">USA</div><div class="cc-flag">🇺🇸</div><div class="cc-time" id="clock-usa">--:--:--</div><div class="cc-date" id="date-usa">--</div><div class="cc-tz">EDT (UTC-4)</div></div>
-    <div class="clock-card"><div class="cc-country">England</div><div class="cc-flag">🇬🇧</div><div class="cc-time" id="clock-uk">--:--:--</div><div class="cc-date" id="date-uk">--</div><div class="cc-tz">BST (UTC+1)</div></div>
-    <div class="clock-card"><div class="cc-country">Germany</div><div class="cc-flag">🇩🇪</div><div class="cc-time" id="clock-ger">--:--:--</div><div class="cc-date" id="date-ger">--</div><div class="cc-tz">CEST (UTC+2)</div></div>
-    <div class="clock-card"><div class="cc-country">Finland</div><div class="cc-flag">🇫🇮</div><div class="cc-time" id="clock-fin">--:--:--</div><div class="cc-date" id="date-fin">--</div><div class="cc-tz">EEST (UTC+3)</div></div>
-    <div class="clock-card"><div class="cc-country">Russia</div><div class="cc-flag">🇷🇺</div><div class="cc-time" id="clock-ru">--:--:--</div><div class="cc-date" id="date-ru">--</div><div class="cc-tz">MSK (UTC+3)</div></div>
+    <div class="clock-card">
+      <div class="cc-country">USA</div>
+      <img class="cc-flag-img" src="https://flagcdn.com/w40/us.png" alt="US"/>
+      <div class="cc-time" id="clock-usa">--:--:--</div>
+      <div class="cc-date" id="date-usa">--</div>
+      <div class="cc-tz">EDT (UTC-4)</div>
+    </div>
+    <div class="clock-card">
+      <div class="cc-country">England</div>
+      <img class="cc-flag-img" src="https://flagcdn.com/w40/gb.png" alt="GB"/>
+      <div class="cc-time" id="clock-uk">--:--:--</div>
+      <div class="cc-date" id="date-uk">--</div>
+      <div class="cc-tz">BST (UTC+1)</div>
+    </div>
+    <div class="clock-card">
+      <div class="cc-country">Germany</div>
+      <img class="cc-flag-img" src="https://flagcdn.com/w40/de.png" alt="DE"/>
+      <div class="cc-time" id="clock-ger">--:--:--</div>
+      <div class="cc-date" id="date-ger">--</div>
+      <div class="cc-tz">CEST (UTC+2)</div>
+    </div>
+    <div class="clock-card">
+      <div class="cc-country">Finland</div>
+      <img class="cc-flag-img" src="https://flagcdn.com/w40/fi.png" alt="FI"/>
+      <div class="cc-time" id="clock-fin">--:--:--</div>
+      <div class="cc-date" id="date-fin">--</div>
+      <div class="cc-tz">EEST (UTC+3)</div>
+    </div>
+    <div class="clock-card">
+      <div class="cc-country">Russia</div>
+      <img class="cc-flag-img" src="https://flagcdn.com/w40/ru.png" alt="RU"/>
+      <div class="cc-time" id="clock-ru">--:--:--</div>
+      <div class="cc-date" id="date-ru">--</div>
+      <div class="cc-tz">MSK (UTC+3)</div>
+    </div>
   </footer>
 
 </div>
