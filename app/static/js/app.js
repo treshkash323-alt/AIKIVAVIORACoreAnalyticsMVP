@@ -6,6 +6,7 @@
 let chatHistory = [];
 let currentSessionId = null;
 let isSending = false;
+let msgCounter = 0;
 
 function handleKey(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -27,7 +28,7 @@ async function sendMessage() {
     appendMessage('user', userMsg);
     chatHistory.push({ role: 'user', content: userMsg });
 
-    const loadingId = appendMessage('assistant', '⏳ Анализирую данные...');
+    const loadingId = appendMessage('assistant', '⏳ Готовлю ответ, ожидайте...');
 
     try {
         const res = await fetch('/api/chat', {
@@ -55,12 +56,12 @@ async function sendMessage() {
         console.error('Chat error:', err);
         updateMessage(loadingId, `❌ Ошибка: ${err.message}`);
     } finally {
-        isSending = false;
+        isSending = false;        
     }
 }
 
 function appendMessage(role, text) {
-    const id = Date.now();
+    const id = ++msgCounter;
     const chat = document.getElementById('chatMessages');
     if (!chat) return null;
 
@@ -82,8 +83,30 @@ function updateMessage(id, text) {
     const el = document.getElementById(`msg-${id}`);
     if (el) {
         const bubble = el.querySelector('.msg-bubble');
-        if (bubble) bubble.textContent = text;
+        if (bubble) bubble.innerHTML = renderMarkdown(text);
     }
+}
+
+function renderMarkdown(text) {
+    return text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code style="background:rgba(0,200,100,.1);padding:1px 5px;border-radius:3px;font-family:monospace;">$1</code>')
+        .replace(/^\|(.+)\|$/gm, (match, cells) => {
+            if (cells.includes('---')) return '';
+            const tds = cells.split('|').map(c =>
+                `<td style="padding:5px 10px;border:1px solid rgba(0,200,100,.2)">${c.trim()}</td>`
+            ).join('');
+            return `<tr>${tds}</tr>`;
+        })
+        .replace(/(<tr>.*<\/tr>)/gs, '<table style="border-collapse:collapse;margin:8px 0;font-size:13px;width:100%">$1</table>')
+        .replace(/^### (.+)$/gm, '<h4 style="color:var(--gold);margin:10px 0 4px;font-size:13px;letter-spacing:1px">$1</h4>')
+        .replace(/^## (.+)$/gm,  '<h3 style="color:var(--gold-bright);margin:12px 0 5px;font-size:14px">$1</h3>')
+        .replace(/^# (.+)$/gm,   '<h2 style="color:var(--gold-bright);margin:14px 0 6px;font-size:16px">$1</h2>')
+        .replace(/^- (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:18px;margin:6px 0">$1</ul>')
+        .replace(/\n/g, '<br>');
 }
 
 // ══════════════════════════════════════════

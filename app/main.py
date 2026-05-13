@@ -111,7 +111,7 @@ async def chat(req: ChatRequest):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": req.message}
             ],
-            max_tokens=1024,
+            max_tokens=2048,
             temperature=0.7
         )
         reply: str = response.choices[0].message.content or "Нет ответа"
