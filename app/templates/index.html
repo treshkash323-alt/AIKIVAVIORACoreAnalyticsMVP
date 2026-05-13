@@ -98,10 +98,19 @@
     .welcome-title .user { color: var(--text-main); }
     .welcome-body { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
     .msg { max-width: 75%; margin-bottom: 12px; }
-    .msg.user-msg { margin-left: auto; }
+    .msg.user-msg { margin-left: auto;  margin-right: 4px; }
+    .msg.ai-msg   { margin-right: auto; margin-left: 4px; }
     .msg-bubble { padding: 11px 16px; border-radius: 10px; font-size: 14px; line-height: 1.6; }
-    .msg.ai-msg   .msg-bubble { background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-main); }
-    .msg.user-msg .msg-bubble { background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.06)); border: 1px solid var(--border-gold); color: var(--gold-bright); }
+    .msg.user-msg .msg-bubble { 
+    background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.06)); 
+    border: 1px solid var(--border-gold); 
+    color: var(--gold-bright); 
+}
+.msg.ai-msg .msg-bubble { 
+    background: var(--bg-card2); 
+    border: 1px solid var(--border); 
+    color: #ffffff; 
+}
     .chat-input-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-top: 1px solid var(--border); background: var(--bg-panel); }
     .chat-input { flex: 1; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; color: var(--text-main); font-family: 'Rajdhani', sans-serif; font-size: 14px; outline: none; resize: none; height: 52px; transition: border-color .2s; }
     .chat-input::placeholder { color: var(--text-dim); }

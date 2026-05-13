@@ -1,128 +1,133 @@
-// ============================================================
-// AIKIVAVIORA — Core Analytics System
-// app.js
-// ============================================================
+// app/static/js/app.js — v0.4 (clocks + chat + nav)
 
-// ── SESSION ID ───────────────────────────────────────────────
-function randHex(n) {
-    return [...crypto.getRandomValues(new Uint8Array(n))]
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-}
+// ══════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════
+let chatHistory = [];
+let currentSessionId = null;
+let isSending = false;
 
-const SESSION_ID = `${randHex(4)}-${randHex(2)}-${randHex(2)}`;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const el = document.getElementById('sessionId');
-    if (el) el.textContent = SESSION_ID;
-});
-
-// ── WORLD CLOCKS ─────────────────────────────────────────────
-const ZONES = [
-    { time: 'clock-usa', date: 'date-usa', tz: 'America/New_York' },
-    { time: 'clock-uk',  date: 'date-uk',  tz: 'Europe/London'    },
-    { time: 'clock-ger', date: 'date-ger', tz: 'Europe/Berlin'    },
-    { time: 'clock-fin', date: 'date-fin', tz: 'Europe/Helsinki'  },
-    { time: 'clock-ru',  date: 'date-ru',  tz: 'Europe/Moscow'    },
-];
-
-const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN',
-                'JUL','AUG','SEP','OCT','NOV','DEC'];
-
-function pad(n) { return String(n).padStart(2, '0'); }
-
-function tickClocks() {
-    const now = new Date();
-    ZONES.forEach(z => {
-        const d = new Date(now.toLocaleString('en-US', { timeZone: z.tz }));
-        const timeEl = document.getElementById(z.time);
-        const dateEl = document.getElementById(z.date);
-        if (timeEl) timeEl.textContent =
-            `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-        if (dateEl) dateEl.textContent =
-            `${pad(d.getDate())} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-    });
-}
-
-tickClocks();
-setInterval(tickClocks, 1000);
-
-// ── NAV ───────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.nav-item').forEach(el => {
-        el.addEventListener('click', () => {
-            document.querySelectorAll('.nav-item')
-                .forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-        });
-    });
-});
-
-// ── CHAT ──────────────────────────────────────────────────────
-function handleKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+function handleKey(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (!isSending) sendMessage();
     }
 }
 
 async function sendMessage() {
-    const input   = document.getElementById('chatInput');
-    const text    = input.value.trim();
-    if (!text) return;
+    if (isSending) return;
 
-    // Показываем сообщение пользователя
-    addBubble(text, 'user-msg');
+    const input = document.getElementById('chatInput');
+    const userMsg = input.value.trim();
+    if (!userMsg) return;
+
+    isSending = true;
     input.value = '';
-    input.disabled = true;
 
-    // Индикатор загрузки
-    const loadId = addBubble('⏳ Thinking...', 'ai-msg', true);
+    appendMessage('user', userMsg);
+    chatHistory.push({ role: 'user', content: userMsg });
+
+    const loadingId = appendMessage('assistant', '⏳ Анализирую данные...');
 
     try {
         const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message:    text,
-                session_id: SESSION_ID
+                message: userMsg,
+                session_id: currentSessionId,
+                history: chatHistory.slice(-10)
             })
         });
 
         const data = await res.json();
 
-        // Убираем индикатор
-        removeBubble(loadId);
-
-        if (data.status === 'ok') {
-            addBubble(data.response, 'ai-msg');
-        } else {
-            addBubble(`❌ Error: ${data.message}`, 'ai-msg error');
+        if (data.session_id) {
+            currentSessionId = data.session_id;
+            const sessEl = document.getElementById('sessionId');
+            if (sessEl) sessEl.textContent = currentSessionId.substring(0, 8) + '...';
         }
 
+        updateMessage(loadingId, data.reply);
+        chatHistory.push({ role: 'assistant', content: data.reply });
+
     } catch (err) {
-        removeBubble(loadId);
-        addBubble(`❌ Connection error: ${err.message}`, 'ai-msg error');
+        console.error('Chat error:', err);
+        updateMessage(loadingId, `❌ Ошибка: ${err.message}`);
     } finally {
-        input.disabled = false;
-        input.focus();
+        isSending = false;
     }
 }
 
-let bubbleCounter = 0;
+function appendMessage(role, text) {
+    const id = Date.now();
+    const chat = document.getElementById('chatMessages');
+    if (!chat) return null;
 
-function addBubble(text, cls, temp = false) {
-    const box = document.getElementById('chatMessages');
-    const id  = `bubble-${++bubbleCounter}`;
-    const d   = document.createElement('div');
-    d.className = `msg ${cls}`;
-    d.id = id;
-    d.innerHTML = `<div class="msg-bubble">${text}</div>`;
-    box.appendChild(d);
-    box.scrollTop = box.scrollHeight;
+    const div = document.createElement('div');
+    div.id = `msg-${id}`;
+    div.className = `msg ${role === 'user' ? 'user-msg' : 'ai-msg'}`;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = text;
+
+    div.appendChild(bubble);
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
     return id;
 }
 
-function removeBubble(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
+function updateMessage(id, text) {
+    const el = document.getElementById(`msg-${id}`);
+    if (el) {
+        const bubble = el.querySelector('.msg-bubble');
+        if (bubble) bubble.textContent = text;
+    }
 }
+
+// ══════════════════════════════════════════
+// WORLD CLOCKS
+// ══════════════════════════════════════════
+const CLOCKS = [
+    { id: 'usa', clockId: 'clock-usa', dateId: 'date-usa', offset: -4  },  // EDT
+    { id: 'uk',  clockId: 'clock-uk',  dateId: 'date-uk',  offset: +1  },  // BST
+    { id: 'ger', clockId: 'clock-ger', dateId: 'date-ger', offset: +2  },  // CEST
+    { id: 'fin', clockId: 'clock-fin', dateId: 'date-fin', offset: +3  },  // EEST
+    { id: 'ru',  clockId: 'clock-ru',  dateId: 'date-ru',  offset: +3  },  // MSK
+];
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function updateClocks() {
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+
+    CLOCKS.forEach(({ clockId, dateId, offset }) => {
+        const local = new Date(utcMs + offset * 3600000);
+        const h = pad(local.getHours());
+        const m = pad(local.getMinutes());
+        const s = pad(local.getSeconds());
+
+        const clockEl = document.getElementById(clockId);
+        const dateEl  = document.getElementById(dateId);
+
+        if (clockEl) clockEl.textContent = `${h}:${m}:${s}`;
+        if (dateEl)  dateEl.textContent  =
+            `${DAYS[local.getDay()]}, ${local.getDate()} ${MONTHS[local.getMonth()]}`;
+    });
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ AIKIVAVIORA Chat UI initialized');
+
+    // Запускаем часы сразу и каждую секунду
+    updateClocks();
+    setInterval(updateClocks, 1000);
+});
