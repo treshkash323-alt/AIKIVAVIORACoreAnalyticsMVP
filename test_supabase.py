@@ -7,20 +7,26 @@ load_dotenv()
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+def main():
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        raise RuntimeError("SUPABASE_URL or SUPABASE_ANON_KEY is not configured")
 
-test_data = {
-    "session_id": "test_session_001",
-    "user_role": "user",
-    "user_message": "Hello AI",
-    "ai_response": "Connection successful",
-    "ai_agent": "DeepSeek",
-    "sentiment": "neutral",
-    "stage": "test",
-    "validation_status": "ok",
-    "notes": "first database insert"
-}
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    test_data = {
+        "session_id": "test_session_001",
+        "user_role": "user",
+        "user_message": "Hello AI",
+        "ai_response": "Connection successful",
+        "ai_agent": "DeepSeek",
+        "sentiment": "neutral",
+        "stage": "test",
+        "validation_status": "ok",
+        "notes": "first database insert"
+    }
 
-response = supabase.table("ai_dialogs").insert(test_data).execute()
+    response = supabase.table("ai_dialogs").insert(test_data).execute()
+    print(response)
 
-print(response)
+
+if __name__ == "__main__":
+    main()

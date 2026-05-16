@@ -335,7 +335,7 @@
         </div>
         <div class="rp-field">
           <div class="rp-field-label">Model</div>
-          <div class="rp-field-value">DeepSeek-R1</div>
+          <div class="rp-field-value" id="modelProvider">—</div>
         </div>
         <div class="rp-field">
           <div class="rp-field-label">Memory</div>
@@ -603,6 +603,9 @@ function exportLogs() {
 async function checkHealth() {
   const res  = await fetch('/health');
   const data = await res.json();
+  if (window.updateProviderBadge && data.model_provider) {
+    window.updateProviderBadge(data.model_provider);
+  }
   alert(`Status: ${data.status}\nDatabase: ${data.database}\nModel: ${data.model_provider}`);
 }
 </script>

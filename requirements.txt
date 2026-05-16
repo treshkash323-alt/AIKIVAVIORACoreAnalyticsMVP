@@ -28,6 +28,7 @@ fastapi==0.136.1
 fastjsonschema==2.21.2
 fqdn==1.5.1
 fsspec==2026.4.0
+google-genai==1.18.0
 h11==0.16.0
 h2==4.3.0
 hpack==4.1.0

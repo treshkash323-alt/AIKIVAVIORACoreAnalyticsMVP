@@ -8,6 +8,24 @@ let currentSessionId = null;
 let isSending = false;
 let msgCounter = 0;
 
+function formatProviderName(provider) {
+    const labels = {
+        deepseek: 'DeepSeek',
+        openai: 'OpenAI',
+        gemini: 'Gemini',
+    };
+    return labels[provider] || provider || '—';
+}
+
+function updateProviderBadge(provider) {
+    const modelEl = document.getElementById('modelProvider');
+    if (modelEl) {
+        modelEl.textContent = formatProviderName(provider);
+    }
+}
+
+window.updateProviderBadge = updateProviderBadge;
+
 function handleKey(event) {
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
@@ -47,6 +65,10 @@ async function sendMessage() {
             currentSessionId = data.session_id;
             const sessEl = document.getElementById('sessionId');
             if (sessEl) sessEl.textContent = currentSessionId.substring(0, 8) + '...';
+        }
+
+        if (data.provider) {
+            updateProviderBadge(data.provider);
         }
 
         updateMessage(loadingId, data.reply);
